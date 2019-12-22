@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.JobInfMapper">
+
+    <!--<cache-ref namespace="personal.wjb.csi.mapper.DeptInfMapper"/>-->
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.JobInf">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="job_desc" property="jobDesc" />
+    </resultMap>
+
+    <resultMap id="ResultMapWithDept" type="personal.wjb.csi.bean.JobInf">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="job_desc" property="jobDesc" />
+        <result column="deptName" property="deptInf.name"/>
+        <result column="deptId" property="deptInf.id"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, job_desc,dept_id
+    </sql>
+    <select id="listAllJobInfs" resultMap="ResultMapWithDept">
+        select j.id,j.name,j.job_desc,d.id deptId,d.name deptName
+        from job_inf j left join dept_inf d
+        on j.dept_id = d.id
+        where j.name like #{jobName}
+    </select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.UserRoleInfMapper">
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.UserRoleInf">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="role_id" property="roleId"/>
+    </resultMap>
+    <update id="updateByUserId">
+        update user_role_inf
+        <set>
+            <if test="roleId != null">
+                role_id =#{roleId}
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+
+    <delete id="deleteUserRoleByUserId">
+        delete from user_role_inf where user_id = #{userId}
+    </delete>
+    <delete id="deleteBatchUserIds">
+        delete from user_role_inf where user_id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.EmployeeInfMapper">
+
+    <!--<cache-ref namespace="personal.wjb.csi.mapper.DeptInfMapper"/>-->
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.EmployeeInf">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="card_id" property="cardId" />
+        <result column="address" property="address" />
+        <result column="post_code" property="postCode" />
+        <result column="phone" property="phone" />
+        <result column="qq_num" property="qqNum" />
+        <result column="email" property="email" />
+        <result column="sex" property="sex" />
+        <result column="party" property="party" />
+        <result column="birthday" property="birthday" />
+        <result column="nation" property="nation" />
+        <result column="degree" property="degree" />
+        <result column="speciality" property="speciality" />
+        <result column="hobby" property="hobby" />
+        <result column="employee_desc" property="employeeDesc" />
+        <association property="deptInf" javaType="personal.wjb.csi.bean.DeptInf">
+            <id property="id" column="d_id"/>
+            <result column="dept_name" property="name"/>
+        </association>
+        <association property="jobInf" javaType="personal.wjb.csi.bean.JobInf">
+            <id column="j_id" property="id"/>
+            <result column="job_name" property="name"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="ListResultMap" type="personal.wjb.csi.bean.EmployeeInf">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="card_id" property="cardId" />
+        <result column="address" property="address" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="sex" property="sex" />
+        <result column="birthday" property="birthday" />
+        <result column="degree" property="degree" />
+        <association property="deptInf" javaType="personal.wjb.csi.bean.DeptInf">
+            <result column="dept_name" property="name"/>
+        </association>
+        <association property="jobInf" javaType="personal.wjb.csi.bean.JobInf">
+            <result column="job_name" property="name"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+         name, card_id, address, post_code, phone, qq_num, email, sex, party, birthday, nation, degree, speciality, hobby, employee_desc, job_id, dept_id
+    </sql>
+    <insert id="addNewEmp" keyProperty="id" useGeneratedKeys="true">
+        insert into employee_inf(<include refid="Base_Column_List"></include>)
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="cardId != null">
+                #{cardId},
+            </if>
+            <if test="address != null">
+                #{address},
+            </if>
+            <if test="postCode != null">
+                #{postCode},
+            </if>
+            <if test="phone != null">
+                #{phone},
+            </if>
+            <if test="qqNum != null">
+                #{qqNum},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="sex != null">
+                #{sex},
+            </if>
+            <if test="party != null">
+                #{party},
+            </if>
+            <if test="birthday != null">
+                #{birthday},
+            </if>
+            <if test="nation != null">
+                #{nation},
+            </if>
+            <if test="degree != null">
+                #{degree},
+            </if>
+            <if test="speciality != null">
+                #{speciality},
+            </if>
+            <if test="hobby != null">
+                #{hobby},
+            </if>
+            <if test="employeeDesc != null">
+                #{employeeDesc},
+            </if>
+            <if test="jobInf.id != null">
+                #{jobInf.id},
+            </if>
+            <if test="deptInf.id != null">
+                #{deptInf.id},
+            </if>
+        </trim>
+    </insert>
+    <select id="listAllEmps" resultMap="ListResultMap">
+        select e.id,e.name,card_id,address,phone,email,sex,degree,birthday,d.name dept_name,j.name job_name
+        from (employee_inf e left join job_inf j on e.job_id = j.id) left join dept_inf d on e.dept_id = d.id
+        <where>
+            <if test="name != ''">
+               and e.name = #{name}
+            </if>
+            <if test="phone != ''">
+                and e.phone = #{phone}
+            </if>
+            <if test="cardId != ''">
+                and card_id = #{cardId}
+            </if>
+            <if test="sex != 0">
+                and sex = #{sex}
+            </if>
+            <if test="deptInf.id != 0">
+                and e.dept_id = #{deptInf.id}
+            </if>
+        </where>
+    </select>
+    <select id="getEmpById" resultMap="BaseResultMap">
+        select e.*,d.id d_id,d.name dept_name,j.id j_id,j.name job_name
+        from (employee_inf e left join job_inf j on e.job_id = j.id) left join dept_inf d on e.dept_id = d.id
+        where e.id = #{id}
+    </select>
+
+</mapper>

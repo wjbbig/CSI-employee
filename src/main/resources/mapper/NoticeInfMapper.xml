@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.NoticeInfMapper">
+
+    <!--<cache-ref namespace="personal.wjb.csi.mapper.DeptInfMapper"/>-->
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.NoticeInf">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="create_date" property="createDate" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <resultMap id="ResultMapWithUser" type="personal.wjb.csi.bean.NoticeInf">
+        <id column="nId" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="create_date" property="createDate" />
+        <association property="userInf" javaType="personal.wjb.csi.bean.UserInf">
+            <id property="id" column="uId"/>
+            <result column="username" property="username"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, create_date, user_id
+    </sql>
+    <select id="listAllNotices" resultMap="ResultMapWithUser">
+        select n.id nId,title,content,create_date,u.id uId,username
+        from notice_inf n left join user_inf u
+        on n.user_id = u.id
+        where title like #{title}
+    </select>
+
+</mapper>

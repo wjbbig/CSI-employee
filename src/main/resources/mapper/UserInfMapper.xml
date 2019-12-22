@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.UserInfMapper">
+
+    <!--<cache-ref namespace="personal.wjb.csi.mapper.DeptInfMapper"/>-->
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.UserInf">
+        <id column="id" property="id" />
+        <result column="login_name" property="loginName" />
+        <result column="password" property="password" />
+        <result column="create_time" property="createTime" />
+        <result column="username" property="username" />
+    </resultMap>
+
+    <resultMap id="ResultMapWithRole" type="personal.wjb.csi.bean.UserInf">
+        <id column="id" property="id" />
+        <result column="login_name" property="loginName" />
+        <result column="password" property="password" />
+        <result column="create_time" property="createTime" />
+        <result column="username" property="username" />
+        <result column="roleId" property="roleInf.id"/>
+        <result column="role_name" property="roleInf.roleName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, login_name, password, create_time, username
+    </sql>
+    <sql id="Insert_Column_List">
+        login_name, password, create_time, username
+    </sql>
+    <insert id="addNewUser" keyProperty="id" useGeneratedKeys="true" >
+        insert into
+        user_inf(<include refid="Insert_Column_List"/>)
+        value
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="loginName != null">
+                #{loginName},
+            </if>
+            <if test="password != null">
+                #{password},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="username != null">
+                #{username},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateUserInf">
+        update user_inf
+        <trim suffixOverrides="," prefix="set">
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="loginName != null">
+                login_name = #{loginName},
+            </if>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserById">
+        delete from user_inf where id = #{id}
+    </delete>
+    <delete id="deleteBatchUserIds">
+        delete from user_inf where id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="getUserByUsernameAndPassword" resultMap="ResultMapWithRole">
+        select u.*,r.id roleId,r.role_name
+        from (user_inf u left join user_role_inf ur on u.id = ur.user_id) left join role_inf r on ur.role_id = r.id
+        <where>
+            <if test="username != null">
+                and login_name = #{username}
+            </if>
+            <if test="password != null">
+                and password = #{password}
+            </if>
+        </where>
+    </select>
+    <select id="getCountByLoginName" resultType="java.lang.Integer">
+        select count(login_name)
+        from user_inf
+        <where>
+            login_name = #{name}
+        </where>
+    </select>
+
+    <select id="listUsers" resultMap="ResultMapWithRole">
+        select u.*,r.id roleId,r.role_name
+        from (user_inf u left join user_role_inf ur on u.id = ur.user_id) left join role_inf r on ur.role_id = r.id
+        <where>
+            <if test="roleId != 0">
+                and r.id = #{roleId}
+            </if>
+            <if test="name != ''">
+                and u.login_name like #{name}
+            </if>
+        </where>
+    </select>
+    <select id="getUserById" resultMap="ResultMapWithRole">
+        select u.*,r.id roleId,r.role_name
+        from (user_inf u left join user_role_inf ur on u.id = ur.user_id) left join role_inf r on ur.role_id = r.id
+        where u.id = #{id}
+    </select>
+    <select id="getPermissionByUserId" resultType="personal.wjb.csi.bean.PermissionInf">
+        select p.*
+        from (((user_inf u left join user_role_inf ur on u.id = ur.user_id ) left join role_inf r on ur.role_id = r.id) left join role_permission_inf rp on r.id = rp.role_id) left join permission_inf p
+        on rp.permission_id = p.id
+        where u.id = #{id}
+    </select>
+
+
+</mapper>

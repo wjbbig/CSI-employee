@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.DocumentInfMapper">
+
+    <!--<cache-ref namespace="personal.wjb.csi.mapper.DeptInfMapper"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.DocumentInf">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="file_name" property="fileName" />
+        <result column="document_desc" property="documentDesc" />
+        <result column="create_date" property="createDate" />
+        <result column="user_id" property="userId" />
+        <result column="username" property="username"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, file_name, document_desc, create_date, user_id
+    </sql>
+    <select id="ListAllDocuments" resultType="personal.wjb.csi.bean.DocumentInf">
+        select d.*,username
+        from document_inf d left join user_inf u
+        on d.user_id = u.id
+        where title like #{s}
+    </select>
+
+</mapper>

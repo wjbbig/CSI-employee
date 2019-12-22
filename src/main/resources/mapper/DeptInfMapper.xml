@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.DeptInfMapper">
+
+    <!--<cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="personal.wjb.csi.bean.DeptInf">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="dept_desc" property="deptDesc" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, dept_desc
+    </sql>
+    <insert id="addNewDept" keyProperty="id" useGeneratedKeys="true">
+        insert into dept_inf(name,dept_desc)
+        values(#{name},#{deptDesc})
+    </insert>
+    <select id="listAllDepartments" resultType="personal.wjb.csi.bean.DeptInf">
+        select <include refid="Base_Column_List"/>
+        from dept_inf
+        where name like #{deptName}
+    </select>
+    <select id="getCountByDeptName" resultType="java.lang.Integer">
+        select count(name)
+        from dept_inf
+        where name = #{name}
+    </select>
+
+</mapper>

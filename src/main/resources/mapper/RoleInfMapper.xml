@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="personal.wjb.csi.mapper.RoleInfMapper">
+
+
+    <insert id="addPermissionByRoleId" useGeneratedKeys="true" keyProperty="id">
+        <foreach collection="permission" item="list" separator=";">
+            insert into role_permission_inf(role_id, permission_id) values (#{roleId},#{list})
+        </foreach>
+    </insert>
+
+    <delete id="deletePermissionByRoleId">
+        delete from role_permission_inf where role_id = #{roleId}
+    </delete>
+
+
+    <select id="getPermissionById" resultType="java.lang.Integer">
+        select permission_id from role_permission_inf where role_id = #{id}
+    </select>
+</mapper>

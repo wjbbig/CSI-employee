@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="personal.wjb.csi">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <bean class="com.mchange.v2.c3p0.ComboPooledDataSource" id="dataSource">
+        <property name="user" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+    </bean>
+
+
+
+    <bean class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="globalConfig" ref="globalConfiguration"/>
+        <property name="mapperLocations" value="classpath*:mapper/*.xml"/>
+        <!--<property name="plugins">-->
+        <!--    <list>-->
+        <!--        &lt;!&ndash;注册分页插件&ndash;&gt;-->
+        <!--        <bean class="com.github.pagehelper.PageInterceptor"></bean>-->
+        <!--    </list>-->
+        <!--</property>-->
+    </bean>
+
+    <!--定义MyBatis Plus的全局策略配置-->
+    <bean class="com.baomidou.mybatisplus.entity.GlobalConfiguration" id="globalConfiguration">
+        <!--2.3版本以上，默认值为true-->
+        <property name="dbColumnUnderline" value="true"/>
+        <!--设置ID策略-->
+        <property name="idType" value="0"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="personal.wjb.csi.mapper"/>
+    </bean>
+
+    <!--可以批量执行的sqlSession-->
+    <!--<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession">-->
+    <!--    <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>-->
+    <!--    <constructor-arg name="executorType" value="BATCH"/>-->
+    <!--</bean>-->
+
+    <!--注解式事务-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" order="200"/>
+
+    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="List*" read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:advisor advice-ref="transactionAdvice" pointcut="execution(* personal.wjb.csi..*ServiceImpl.*(..))"/>
+    </aop:config>
+
+
+
+
+</beans>
